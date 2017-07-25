@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name" translatable="false">Dot Dodger</string>
+    <string name="start">Start</string>
+    <string name="customize">Customize</string>
+    <string name="gameOver">Game Over!</string>
+    <string name="replay">Replay</string>
+    <string name="menu">Menu</string>
+    <string name="highScore">High Score:</string>
+    <string name="score">Score:</string>
+    <string name="newHighScore">New High Score:</string>
+</resources>

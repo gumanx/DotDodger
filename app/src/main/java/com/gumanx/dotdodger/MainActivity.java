@@ -1,0 +1,35 @@
+package com.gumanx.dotdodger;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Loads stored data
+        SharedPreferences prefs = getSharedPreferences("dotDodgePrefs", Context.MODE_PRIVATE);
+
+        // Sets high score
+        TextView scoreIntText = (TextView) findViewById(R.id.scoreIntText);
+        scoreIntText.setText(Integer.toString(prefs.getInt("highScore", 0)));
+    }
+
+    public void startGameActivity(View view) {
+        Intent intent = new Intent(this, GameActivity.class);
+        startActivity(intent);
+    }
+
+    public void startCustomizeActivity(View view) {
+        Intent intent = new Intent(this, CustomizeActivity.class);
+        startActivity(intent);
+    }
+}
