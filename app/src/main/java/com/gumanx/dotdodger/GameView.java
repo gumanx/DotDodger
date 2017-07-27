@@ -45,12 +45,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceCreated(SurfaceHolder holder) {
         width = getWidth();
         height = getHeight();
-        radiusDot = width/16;
+        radiusDot = width/12;
         spawnDelay = 300;
         paintText.setColor(Color.WHITE);
         paintText.setTextSize(72);
 
-        player = new Dot(width/2, 3*height/4, 0, GameActivity.dotColor, radiusDot);
+        player = new Dot(width/2, 4*height/5, 0, GameActivity.dotColor, width/16);
 
         // Start the thread
         thread.setRunning(true);
@@ -96,7 +96,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             // Moves the spaceship to either the left or right
             if(event.getX() > (width/2)) {
                 player.setXVelocity(width/32);
@@ -159,7 +159,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     protected void createObstacle() {
         if (obstacleScheduled) {
             obstacleList.add(new Dot(rand.nextInt(width - 2*radiusDot) + radiusDot,
-                    0, height/36, Color.RED, radiusDot));
+                    0, height/30, Color.RED, radiusDot));
             obstacleScheduled = false;
         }
     }
