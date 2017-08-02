@@ -21,13 +21,18 @@ import java.util.TimerTask;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final Random rand = new Random();
-    private Paint paintText = new Paint();
+    private static final Paint paintText = new Paint();
     private Timer timer = new Timer();
     private GameThread gameThread;
-    private int height, width, radiusDot, spawnDelay, score, obstacleScheduled;
+    private int height, width, radiusDot, score, spawnDelay, obstacleScheduled;
     private Dot player;
     private ArrayList<Dot> obstacleList = new ArrayList<>();
     private ArrayList<Integer> obstaclesToRemove = new ArrayList<>();
+
+    {
+        paintText.setColor(Color.WHITE);
+        paintText.setTextSize(72);
+    }
 
     public GameView(Context context) {
         super(context);
@@ -42,11 +47,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         width = getWidth();
         height = getHeight();
         radiusDot = width/12;
-        spawnDelay = 21;
         score = 0;
+        spawnDelay = 21;
         obstacleScheduled = 0;
-        paintText.setColor(Color.WHITE);
-        paintText.setTextSize(72);
 
         player = new Dot(width/2, 4*height/5, 0, MainActivity.dotColor, width/16);
 
@@ -61,7 +64,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     spawnDelay--;
                 }
             }
-        }, 1000, 3000);
+        }, 1000, 1500);
     }
 
     @Override
@@ -107,7 +110,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawColor(Color.BLACK);
 
         // Draws the player and obstacles on the canvas
-        // Then marks down the obstacles off the screen
         player.draw(canvas);
         player.keepInBorders(width);
         synchronized (obstacleList) {
@@ -123,10 +125,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
-        Calculates the distance between each obstacle and the player.
-        If the distance is less than the radius,
-        the thread is terminated and the DodgeGameOverActivity is displayed
-        */
+     * Checks for collisions and if one is detected,
+     * the thread is terminated and the GameOverActivity is displayed.
+     * Also checks for obstacles that have reached the bottom of the screen and
+     * removes those that have.
+     */
     protected void collisionCheck() {
         synchronized (obstacleList) {
             for(Dot obstacle : obstacleList) {
@@ -137,6 +140,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     intent.putExtra("score", score);
                     getContext().startActivity(intent);
                 }
+                // Checks if the obstacle reached the bottom of the screen
                 if(obstacle.reachedBottomCheck(height)) {
                     obstaclesToRemove.add(obstacleList.indexOf(obstacle));
                     score++;
@@ -151,6 +155,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         obstaclesToRemove.clear();
     }
 
+    /**
+     * Creates an obstacle at the specified time intervals
+     */
     protected void createObstacle() {
         if (obstacleScheduled >= spawnDelay) {
             synchronized (obstacleList) {
