@@ -29,7 +29,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private ArrayList<Dot> obstacleList = new ArrayList<>();
     private ArrayList<Integer> obstaclesToRemove = new ArrayList<>();
 
-    {
+    static {
         paintText.setColor(Color.WHITE);
         paintText.setTextSize(72);
     }
