@@ -25,10 +25,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private static final Random rand = new Random();
     private Paint paintText = new Paint();
     private Timer timer = new Timer();
-    private GameThread thread;
-    private int height, width, radiusDot, spawnDelay;
-    private int score = 0;
-    private boolean obstacleScheduled = false;
+    private GameThread gameThread;
+    private int height, width, radiusDot, spawnDelay, score, obstacleScheduled;
     private Dot player;
     private ArrayList<Dot> obstacleList = new ArrayList<>();
     private ArrayList<Integer> obstaclesToRemove = new ArrayList<>();
@@ -37,7 +35,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         super(context);
         getHolder().addCallback(this);
 
-        thread = new GameThread(getHolder(), this);
+        gameThread = new GameThread(getHolder(), this);
         setFocusable(true);
     }
 
@@ -46,28 +44,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         width = getWidth();
         height = getHeight();
         radiusDot = width/12;
-        spawnDelay = 300;
+        spawnDelay = 21;
+        score = 0;
+        obstacleScheduled = 0;
         paintText.setColor(Color.WHITE);
         paintText.setTextSize(72);
 
         player = new Dot(width/2, 4*height/5, 0, MainActivity.dotColor, width/16);
 
         // Start the thread
-        thread.setRunning(true);
-        thread.start();
-
-        // Set a timer creating a new obstacle at a random location every 300 ms
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                obstacleScheduled = true;
-            }
-        }, 1000, spawnDelay);
+        gameThread.setRunning(true);
+        gameThread.start();
 
         // Decreases the time between each spawn as time goes on
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                if(spawnDelay > 200) {
-                    spawnDelay = spawnDelay - 50;
+                if(spawnDelay > 15) {
+                    spawnDelay--;
                 }
             }
         }, 1000, 3000);
@@ -85,7 +78,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         while(retry) {
             try{
                 // Terminates the thread should the surface get destroyed
-                thread.join();
+                gameThread.join();
                 timer.cancel();
                 retry = false;
             } catch (InterruptedException e) {
@@ -117,10 +110,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         // Draws the player and obstacles on the canvas
         // Then marks down the obstacles off the screen
-        player.keepInBorders(width);
         player.draw(canvas);
-        for(Dot dot : obstacleList) {
-            dot.draw(canvas);
+        player.keepInBorders(width);
+        synchronized (obstacleList) {
+            for(Dot dot : obstacleList) {
+                dot.draw(canvas);
+            }
         }
 
         // Displays Score
@@ -135,32 +130,38 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         the thread is terminated and the DodgeGameOverActivity is displayed
         */
     protected void collisionCheck() {
-        for(Dot obstacle : obstacleList) {
-            if (player.collisionCheck(obstacle)) {
-                // Terminates the game thread and sets the active activity to GameOverActivity
-                thread.setRunning(false);
-                Intent intent = new Intent().setClass(getContext(), GameOverActivity.class);
-                intent.putExtra("score", score);
-                getContext().startActivity(intent);
+        synchronized (obstacleList) {
+            for(Dot obstacle : obstacleList) {
+                if (player.collisionCheck(obstacle)) {
+                    // Terminates the game thread and sets the active activity to GameOverActivity
+                    gameThread.setRunning(false);
+                    Intent intent = new Intent().setClass(getContext(), GameOverActivity.class);
+                    intent.putExtra("score", score);
+                    getContext().startActivity(intent);
+                }
+                if(obstacle.reachedBottomCheck(height)) {
+                    obstaclesToRemove.add(obstacleList.indexOf(obstacle));
+                    score++;
+                }
             }
-            if(obstacle.reachedBottomCheck(height)) {
-                obstaclesToRemove.add(obstacleList.indexOf(obstacle));
-                score++;
-            }
-        }
 
-        // Removes the obstacles marked for deletion
-        for (Integer index: obstaclesToRemove) {
-            obstacleList.remove(index.intValue());
+            // Removes the obstacles marked for deletion
+            for (Integer index: obstaclesToRemove) {
+                obstacleList.remove(index.intValue());
+            }
         }
         obstaclesToRemove.clear();
     }
 
     protected void createObstacle() {
-        if (obstacleScheduled) {
-            obstacleList.add(new Dot(rand.nextInt(width - 2*radiusDot) + radiusDot,
-                    0, height/30, Color.RED, radiusDot));
-            obstacleScheduled = false;
+        if (obstacleScheduled >= spawnDelay) {
+            synchronized (obstacleList) {
+                obstacleList.add(new Dot(rand.nextInt(width - 2*radiusDot) + radiusDot,
+                        0, height/32, Color.RED, radiusDot));
+            }
+            obstacleScheduled = 0;
+        } else {
+            obstacleScheduled++;
         }
     }
 }

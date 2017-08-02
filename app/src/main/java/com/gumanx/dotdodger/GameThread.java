@@ -30,12 +30,13 @@ class GameThread extends Thread {
         Canvas canvas;
         while(isRunning) {
             canvas = null;
+            gameView.createObstacle();
+            gameView.collisionCheck();
+            // TODO Move game operations and screen updating to separate threads
             try {
                 canvas = surfaceHolder.lockCanvas();
                 synchronized (surfaceHolder) {
-                    gameView.createObstacle();
                     gameView.onDraw(canvas);
-                    gameView.collisionCheck();
                 }
                 sleep(10);
             } catch (InterruptedException e) {
