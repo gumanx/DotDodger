@@ -10,8 +10,6 @@ import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
