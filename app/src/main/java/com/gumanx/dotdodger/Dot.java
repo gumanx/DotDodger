@@ -23,22 +23,41 @@ class Dot {
         paint.setStyle(Paint.Style.FILL);
     }
 
+    /**
+     * Sets the x velocity
+     * @param xVelocity Desired velocity
+     */
     void setXVelocity(int xVelocity) {
         this.xVelocity = xVelocity;
     }
 
+    /**
+     * Renders the dot object and moves it according to its velocity
+     * @param canvas Canvas to be drawn onto
+     */
     void draw(Canvas canvas) {
         canvas.drawCircle(x, y, radius, paint);
         x = x + xVelocity;
         y = y + yVelocity;
     }
 
+    /**
+     * This method checks if the dot object has collided with
+     * the other dot object. If so, it returns true.
+     * @param other Dot to be compared against
+     * @return Collision occurred
+     */
     boolean collisionCheck(Dot other) {
         double distance = Math.sqrt(((x - other.x) * (x - other.x))
                 + ((y - other.y) * (y - other.y)));
         return distance <= (2 * radius);
     }
 
+    /**
+     *  This method checks if the dot is off the screen horizontally. If it is,
+     *  it moves the dot back onto the screen.
+     * @param width Width of screen
+     */
     void keepInBorders(int width) {
         if (x + radius > width) {
             x = width - radius;
@@ -48,14 +67,13 @@ class Dot {
     }
 
     /**
-     *
-     * @param height of screen
-     * @return reached bottom of screen
+     *  This method checks if the dot is below the screen. If it is, it returns true.
+     * @param height Height of screen
+     * @return Reached bottom of screen
      */
     boolean reachedBottomCheck(int height) {
         return y > height;
     }
-
 
 }
 

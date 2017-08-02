@@ -3,12 +3,15 @@ package com.gumanx.dotdodger;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    static int dotColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Loads stored data
         SharedPreferences prefs = getSharedPreferences("dotDodgePrefs", Context.MODE_PRIVATE);
+        dotColor = prefs.getInt("dotColor", Color.CYAN);
 
         // Sets high score
         TextView scoreIntText = (TextView) findViewById(R.id.scoreIntText);
@@ -24,8 +28,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startGameActivity(View view) {
-        Intent intent = new Intent(this, GameActivity.class);
-        startActivity(intent);
+        setContentView(new GameView(this));
     }
 
     public void startCustomizeActivity(View view) {

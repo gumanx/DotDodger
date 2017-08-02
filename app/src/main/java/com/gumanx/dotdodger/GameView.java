@@ -17,7 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by gumanx on 4/13/2017.
+ * Game Screen
  */
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
@@ -50,7 +50,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paintText.setColor(Color.WHITE);
         paintText.setTextSize(72);
 
-        player = new Dot(width/2, 4*height/5, 0, GameActivity.dotColor, width/16);
+        player = new Dot(width/2, 4*height/5, 0, MainActivity.dotColor, width/16);
 
         // Start the thread
         thread.setRunning(true);
@@ -97,7 +97,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            // Moves the spaceship to either the left or right
+            // Moves the player to either the left or right
             if(event.getX() > (width/2)) {
                 player.setXVelocity(width/32);
             } else {

@@ -28,7 +28,6 @@ public class GameOverActivity extends AppCompatActivity {
         if (prefs.getInt("highScore", 0) < score) {
             TextView scoreText = (TextView) findViewById(R.id.scoreText);
             scoreText.setText("New High Score:");
-
             prefsEditor.putInt("highScore", score);
         }
 
@@ -38,8 +37,7 @@ public class GameOverActivity extends AppCompatActivity {
     }
 
     public void replay(View view) {
-        Intent intent = new Intent(this, GameActivity.class);
-        startActivity(intent);
+        setContentView(new GameView(this));
     }
 
     public void toMenu(View view) {
