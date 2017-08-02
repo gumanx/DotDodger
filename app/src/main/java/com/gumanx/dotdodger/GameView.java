@@ -104,7 +104,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
-    public void onDraw(Canvas canvas) throws ConcurrentModificationException {
+    public void onDraw(Canvas canvas) {
         // Draws background to cover previous frame
         canvas.drawColor(Color.BLACK);
 
