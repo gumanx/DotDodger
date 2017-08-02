@@ -9,15 +9,15 @@ import android.graphics.Paint;
 
 class Dot {
 
-    private int x, y, radius;
-    private int xVelocity = 0;
-    private int yVelocity;
+    private int radius;
+    private float x, y, xVelocity, yVelocity;
     private Paint paint = new Paint();
 
     Dot(int x, int y, int yVelocity, int color, int radius) {
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.xVelocity = 0;
         this.yVelocity = yVelocity;
         paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
