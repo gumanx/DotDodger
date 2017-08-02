@@ -9,9 +9,8 @@ import android.graphics.Paint;
 
 class Dot {
 
-    private int radius;
-    private float x, y, xVelocity, yVelocity;
-    private Paint paint = new Paint();
+    private final Paint paint = new Paint();
+    private float x, y, xVelocity, yVelocity, radius;
 
     Dot(int x, int y, int yVelocity, int color, int radius) {
         this.x = x;
@@ -48,9 +47,8 @@ class Dot {
      * @return Collision occurred
      */
     boolean collisionCheck(Dot other) {
-        double distance = Math.sqrt(((x - other.x) * (x - other.x))
-                + ((y - other.y) * (y - other.y)));
-        return distance <= (2 * radius);
+        float distance = ((x - other.x) * (x - other.x)) + ((y - other.y) * (y - other.y));
+        return distance <= (2 * radius) * (2 * radius);
     }
 
     /**
