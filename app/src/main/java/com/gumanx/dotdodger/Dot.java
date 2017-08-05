@@ -31,24 +31,31 @@ class Dot {
     }
 
     /**
-     * Renders the dot object and moves it according to its velocity
-     * @param canvas Canvas to be drawn onto
+     * Moves the dot by its x and y velocities
      */
-    void draw(Canvas canvas) {
-        canvas.drawCircle(x, y, radius, paint);
+    void updatePosition() {
         x = x + xVelocity;
         y = y + yVelocity;
     }
 
     /**
+     * Renders the dot object and moves it according to its velocity
+     * @param canvas Canvas to be drawn onto
+     */
+    void draw(Canvas canvas) {
+        canvas.drawCircle(x, y, radius, paint);
+    }
+
+    /**
      * This method checks if the dot object has collided with
      * the other dot object. If so, it returns true.
-     * @param other Dot to be compared against
+     * @param o Dot to be compared against
      * @return Collision occurred
      */
-    boolean collisionCheck(Dot other) {
-        float distance = ((x - other.x) * (x - other.x)) + ((y - other.y) * (y - other.y));
-        return distance <= (2 * radius) * (2 * radius);
+    boolean collisionCheck(Dot o) {
+        // Since this is only a comparison of distances, x^2 + y^2 <= minDist^2
+        return ((x - o.x) * (x - o.x)) + ((y - o.y) * (y - o.y))
+                <= (2 * radius) * (2 * radius);
     }
 
     /**

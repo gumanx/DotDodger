@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
@@ -20,18 +21,27 @@ import java.util.TimerTask;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private static final Random rand = new Random();
-    private static final Paint paintText = new Paint();
-    private Timer timer = new Timer();
     private GameThread gameThread;
-    private int height, width, radiusDot, score, spawnDelay, obstacleScheduled;
-    private Dot player;
-    private ArrayList<Dot> obstacleList = new ArrayList<>();
-    private ArrayList<Integer> obstaclesToRemove = new ArrayList<>();
+    private int height, width, radiusDot, score, spawnDelay, spawnDelayCount;
+    private Random rand = new Random();
+    private Timer timer = new Timer();
 
-    static {
+    // Vars for obstacles and the player
+    private Dot player;
+    private final ArrayList<Dot> obstacleList = new ArrayList<>();
+    private final ArrayList<Integer> obstaclesToRemove = new ArrayList<>();
+
+    // Vars for drawing the movement buttons
+    private Paint paintText = new Paint();
+    private Paint paintMovementArrows = new Paint();
+    private Path leftTrianglePath = new Path();
+    private Path rightTrianglePath = new Path();
+
+    {
         paintText.setColor(Color.WHITE);
         paintText.setTextSize(72);
+        paintMovementArrows.setColor(Color.WHITE);
+        paintMovementArrows.setAlpha(125);
     }
 
     public GameView(Context context) {
@@ -49,9 +59,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         radiusDot = width/12;
         score = 0;
         spawnDelay = 21;
-        obstacleScheduled = 0;
+        spawnDelayCount = 0;
 
         player = new Dot(width/2, 4*height/5, 0, MainActivity.dotColor, width/16);
+
+        // Assign locations for left and right movement buttons
+        leftTrianglePath.moveTo(width/8, 4*height/5);
+        leftTrianglePath.lineTo(width/4, 15*height/20);
+        leftTrianglePath.lineTo(width/4, 17*height/20);
+        leftTrianglePath.close();
+        rightTrianglePath.moveTo(7*width/8, 4*height/5);
+        rightTrianglePath.lineTo(3*width/4, 15*height/20);
+        rightTrianglePath.lineTo(3*width/4, 17*height/20);
+        rightTrianglePath.close();
 
         // Start the thread
         gameThread.setRunning(true);
@@ -105,34 +125,43 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         return true;
     }
 
+    /**
+     * Draws everything onto the canvas
+     * @param canvas Canvas to be drawn onto
+     */
     public void onDraw(Canvas canvas) {
         // Draws background to cover previous frame
         canvas.drawColor(Color.BLACK);
 
         // Draws the player and obstacles on the canvas
         player.draw(canvas);
-        player.keepInBorders(width);
         synchronized (obstacleList) {
             for(Dot dot : obstacleList) {
                 dot.draw(canvas);
             }
         }
 
-        // Displays Score
+        // Displays score and left and right movement buttons
+        canvas.drawPath(leftTrianglePath, paintMovementArrows);
+        canvas.drawPath(rightTrianglePath, paintMovementArrows);
         canvas.drawText(Integer.toString(score), 7*width/8, height/12, paintText);
 
         // TODO Add a menu
     }
 
     /**
-     * Checks for collisions and if one is detected,
-     * the thread is terminated and the GameOverActivity is displayed.
-     * Also checks for obstacles that have reached the bottom of the screen and
-     * removes those that have.
+     * Updates the game state by moving all the dots, checking for collisions,
+     * and checking if any of the dots are off the screen.
      */
-    protected void collisionCheck() {
+    protected void updateDots() {
+        // Updates player location
+        player.updatePosition();
+        player.keepInBorders(width);
+
         synchronized (obstacleList) {
             for(Dot obstacle : obstacleList) {
+                // Updates obstacle location
+                obstacle.updatePosition();
                 if (player.collisionCheck(obstacle)) {
                     // Terminates the game thread and sets the active activity to GameOverActivity
                     gameThread.setRunning(false);
@@ -159,14 +188,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
      * Creates an obstacle at the specified time intervals
      */
     protected void createObstacle() {
-        if (obstacleScheduled >= spawnDelay) {
+        if (spawnDelayCount >= spawnDelay) {
             synchronized (obstacleList) {
                 obstacleList.add(new Dot(rand.nextInt(width - 2*radiusDot) + radiusDot,
                         0, height/32, Color.RED, radiusDot));
             }
-            obstacleScheduled = 0;
+            spawnDelayCount = 0;
         } else {
-            obstacleScheduled++;
+            spawnDelayCount++;
         }
     }
 }

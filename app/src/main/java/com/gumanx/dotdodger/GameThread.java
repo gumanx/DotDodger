@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
 /**
- * Created by gumanx on 4/13/2017.
+ * Thread that handles the game logic and rendering
  */
 
 class GameThread extends Thread {
@@ -31,8 +31,7 @@ class GameThread extends Thread {
         while(isRunning) {
             canvas = null;
             gameView.createObstacle();
-            gameView.collisionCheck();
-            // TODO Move game operations and screen updating to separate threads
+            gameView.updateDots();
             try {
                 canvas = surfaceHolder.lockCanvas();
                 synchronized (surfaceHolder) {
